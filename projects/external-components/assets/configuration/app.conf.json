@@ -1,1 +1,48 @@
-{}
+{
+  "Track-baby-vaccination": {
+    "headerField": {
+      "fetchFromLocal": true,
+      "localURL": "./assets/pageLayout/Track-baby-vaccination/Track-baby-vaccination/header.field.json"
+    },
+    "headerSection": {
+      "fetchFromLocal": true,
+      "localURL": "./assets/pageLayout/Track-baby-vaccination/Track-baby-vaccination/header.section.json"
+    },
+    "field": {
+      "fetchFromLocal": true,
+      "localURL": "./assets/pageLayout/Track-baby-vaccination/Track-baby-vaccination/body.field.json"
+    },
+    "section": {
+      "fetchFromLocal": true,
+      "localURL": "./assets/pageLayout/Track-baby-vaccination/Track-baby-vaccination/body.section.json"
+    },
+    "footerField": {
+      "fetchFromLocal": true,
+      "localURL": "./assets/pageLayout/Track-baby-vaccination/Track-baby-vaccination/footer.field.json"
+    },
+    "footerSection": {
+      "fetchFromLocal": true,
+      "localURL": "./assets/pageLayout/Track-baby-vaccination/Track-baby-vaccination/footer.section.json"
+    },
+    "data": {
+      "fetchFromLocal": true,
+      "localURL": "./assets/pageLayout/Track-baby-vaccination/Track-baby-vaccination/body.data.json"
+    },
+    "navField": {
+      "fetchFromLocal": true,
+      "localURL": "./assets/pageLayout/Track-baby-vaccination/Track-baby-vaccination/nav.field.json"
+    },
+    "navSection": {
+      "fetchFromLocal": true,
+      "localURL": "./assets/pageLayout/Track-baby-vaccination/Track-baby-vaccination/nav.section.json"
+    },
+    "authGuardConfig": {
+      "enabled": false,
+      "conditions": []
+    },
+    "globalPageSettings": {
+      "title": "Track-baby-vaccination",
+      "layoutProperties": null
+    }
+  }
+}
