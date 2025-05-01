@@ -293,8 +293,8 @@ export class SnakeGameComponent extends CommonExternalComponent {
 
 /*
 Features:
-- Classic Snake game with swipe (mobile), keyboard (desktop), and on-screen button controls.
-- Four direction buttons (up, down, left, right) for easier mobile play.
+- Classic Snake game with swipe (mobile), keyboard (desktop), and on-screen direction button controls.
+- Four buttons (up, down, left, right) for movement; buttons are disabled if the move would reverse the snake.
 - Sound effects for eating food and game over using online files:
   - Eat: https://cdn.pixabay.com/audio/2022/03/15/audio_115b9e3c2f.mp3
   - Game over: https://cdn.pixabay.com/audio/2022/07/26/audio_124bfa3c2a.mp3
