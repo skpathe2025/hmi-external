@@ -24,6 +24,14 @@ type Direction = 'up' | 'down' | 'left' | 'right';
         Game Over<br>
         <button (click)="resetGame()">Restart</button>
       </div>
+      <div class="controls">
+        <button aria-label="Up" (click)="changeDirection('up')" [disabled]="direction==='down'">&#8593;</button>
+        <div>
+          <button aria-label="Left" (click)="changeDirection('left')" [disabled]="direction==='right'">&#8592;</button>
+          <button aria-label="Down" (click)="changeDirection('down')" [disabled]="direction==='up'">&#8595;</button>
+          <button aria-label="Right" (click)="changeDirection('right')" [disabled]="direction==='left'">&#8594;</button>
+        </div>
+      </div>
     </div>
     <audio #eatSound id="eatSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9e3c2f.mp3"></audio>
     <audio #gameOverSound id="gameOverSound" src="https://cdn.pixabay.com/audio/2022/07/26/audio_124bfa3c2a.mp3"></audio>
@@ -72,14 +80,34 @@ type Direction = 'up' | 'down' | 'left' | 'right';
       margin-top: 12px;
     }
     button {
-      margin-top: 10px;
-      padding: 6px 16px;
-      font-size: 1em;
-      border-radius: 4px;
+      margin: 4px;
+      padding: 10px 18px;
+      font-size: 1.2em;
+      border-radius: 6px;
       border: none;
       background: #4caf50;
       color: white;
       cursor: pointer;
+      min-width: 44px;
+      min-height: 44px;
+      transition: background 0.2s;
+    }
+    button[disabled] {
+      background: #888 !important;
+      cursor: not-allowed;
+    }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 14px;
+      gap: 2px;
+      user-select: none;
+    }
+    .controls > div {
+      display: flex;
+      justify-content: center;
+      gap: 2px;
     }
   `]
 })
@@ -138,7 +166,7 @@ export class SnakeGameComponent extends CommonExternalComponent {
         x: Math.floor(Math.random() * this.boardSize),
         y: Math.floor(Math.random() * this.boardSize)
       };
-    } while (this.snake.some(seg => seg.x === newFood.x && seg.y === newFood.y));
+    } while (this.snake.some((seg: {x: number, y: number}) => seg.x === newFood.x && seg.y === newFood.y));
     this.food = newFood;
   }
 
@@ -163,7 +191,7 @@ export class SnakeGameComponent extends CommonExternalComponent {
     if (
       head.x < 0 || head.x >= this.boardSize ||
       head.y < 0 || head.y >= this.boardSize ||
-      this.snake.some(seg => seg.x === head.x && seg.y === head.y)
+      this.snake.some((seg: {x: number, y: number}) => seg.x === head.x && seg.y === head.y)
     ) {
       this.gameOver = true;
       clearInterval(this.gameInterval);
@@ -191,7 +219,7 @@ export class SnakeGameComponent extends CommonExternalComponent {
   }
 
   isSnakeCell(x: number, y: number): boolean {
-    return this.snake.some(seg => seg.x === x && seg.y === y);
+    return this.snake.some((seg: {x: number, y: number}) => seg.x === x && seg.y === y);
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -210,6 +238,19 @@ export class SnakeGameComponent extends CommonExternalComponent {
       case 'ArrowRight':
         if (this.direction !== 'left') this.nextDirection = 'right';
         break;
+    }
+  }
+
+  changeDirection(dir: Direction): void {
+    if (this.gameOver) return;
+    // Prevent reversing into itself
+    if (
+      (dir === 'up' && this.direction !== 'down') ||
+      (dir === 'down' && this.direction !== 'up') ||
+      (dir === 'left' && this.direction !== 'right') ||
+      (dir === 'right' && this.direction !== 'left')
+    ) {
+      this.nextDirection = dir;
     }
   }
 
@@ -252,7 +293,8 @@ export class SnakeGameComponent extends CommonExternalComponent {
 
 /*
 Features:
-- Classic Snake game with swipe (mobile) and keyboard (desktop) controls.
+- Classic Snake game with swipe (mobile), keyboard (desktop), and on-screen button controls.
+- Four direction buttons (up, down, left, right) for easier mobile play.
 - Sound effects for eating food and game over using online files:
   - Eat: https://cdn.pixabay.com/audio/2022/03/15/audio_115b9e3c2f.mp3
   - Game over: https://cdn.pixabay.com/audio/2022/07/26/audio_124bfa3c2a.mp3
