@@ -25,6 +25,8 @@ type Direction = 'up' | 'down' | 'left' | 'right';
         <button (click)="resetGame()">Restart</button>
       </div>
     </div>
+    <audio #eatSound id="eatSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9e3c2f.mp3"></audio>
+    <audio #gameOverSound id="gameOverSound" src="https://cdn.pixabay.com/audio/2022/07/26/audio_124bfa3c2a.mp3"></audio>
   `,
   styles: [`
     .snake-container {
@@ -92,6 +94,11 @@ export class SnakeGameComponent extends CommonExternalComponent {
   score: number = 0;
   gameOver: boolean = false;
 
+  // Speed and sound
+  speed: number = 120;
+  readonly minSpeed: number = 60;
+  readonly speedStep: number = 8;
+
   // Touch tracking for swipe detection
   private touchStartX: number = 0;
   private touchStartY: number = 0;
@@ -111,10 +118,11 @@ export class SnakeGameComponent extends CommonExternalComponent {
     this.nextDirection = 'right';
     this.score = 0;
     this.gameOver = false;
+    this.speed = 120;
     this.generateBoard();
     this.placeFood();
     clearInterval(this.gameInterval);
-    this.gameInterval = setInterval(() => this.moveSnake(), 120);
+    this.setGameInterval();
   }
 
   generateBoard(): void {
@@ -132,6 +140,11 @@ export class SnakeGameComponent extends CommonExternalComponent {
       };
     } while (this.snake.some(seg => seg.x === newFood.x && seg.y === newFood.y));
     this.food = newFood;
+  }
+
+  setGameInterval(): void {
+    clearInterval(this.gameInterval);
+    this.gameInterval = setInterval(() => this.moveSnake(), this.speed);
   }
 
   moveSnake(): void {
@@ -154,6 +167,7 @@ export class SnakeGameComponent extends CommonExternalComponent {
     ) {
       this.gameOver = true;
       clearInterval(this.gameInterval);
+      this.playGameOverSound();
       return;
     }
 
@@ -162,8 +176,17 @@ export class SnakeGameComponent extends CommonExternalComponent {
     if (head.x === this.food.x && head.y === this.food.y) {
       this.score++;
       this.placeFood();
+      this.increaseSpeed();
+      this.playEatSound();
     } else {
       this.snake.pop();
+    }
+  }
+
+  increaseSpeed(): void {
+    if (this.speed > this.minSpeed) {
+      this.speed = Math.max(this.minSpeed, this.speed - this.speedStep);
+      this.setGameInterval();
     }
   }
 
@@ -209,12 +232,31 @@ export class SnakeGameComponent extends CommonExternalComponent {
       else if (dy < -30 && this.direction !== 'down') this.nextDirection = 'up';
     }
   }
+
+  playEatSound(): void {
+    const audioElem = document.getElementById('eatSound') as HTMLAudioElement | null;
+    if (audioElem) {
+      audioElem.currentTime = 0;
+      audioElem.play().catch(() => {});
+    }
+  }
+
+  playGameOverSound(): void {
+    const audioElem = document.getElementById('gameOverSound') as HTMLAudioElement | null;
+    if (audioElem) {
+      audioElem.currentTime = 0;
+      audioElem.play().catch(() => {});
+    }
+  }
 }
 
 /*
 Features:
-- Classic Snake game playable with swipe gestures (mobile) and arrow keys (desktop).
-- Responsive board and touch controls.
-- Score tracking and restart option after game over.
+- Classic Snake game with swipe (mobile) and keyboard (desktop) controls.
+- Sound effects for eating food and game over using online files:
+  - Eat: https://cdn.pixabay.com/audio/2022/03/15/audio_115b9e3c2f.mp3
+  - Game over: https://cdn.pixabay.com/audio/2022/07/26/audio_124bfa3c2a.mp3
+- Score tracking and restart option.
+- Snake speed increases each time food is eaten.
 - No external libraries required.
 */
