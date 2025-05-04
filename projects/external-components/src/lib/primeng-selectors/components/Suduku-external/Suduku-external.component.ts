@@ -4,9 +4,11 @@ import { CommonExternalComponent } from '../common-external/common-external.comp
 /*
   Features:
   - 3x3 Sudoku grid (single box)
-  - Input validation: accepts digits 1-3 only
+  - Some cells are prefilled with numbers and disabled for editing
+  - Input validation: accepts digits 1-3 only in editable cells
   - Highlights invalid entries (duplicates in row/column/box)
-  - Reset button to clear the board
+  - Reset button to clear the board (restores prefilled numbers)
+  - Button uses blue color scheme
 */
 
 @Component({
@@ -20,9 +22,10 @@ import { CommonExternalComponent } from '../common-external/common-external.comp
             <input
               type="text"
               maxlength="1"
+              [value]="grid[i][j]"
+              [disabled]="isPrefilled(i, j)"
               [ngClass]="{'invalid': isInvalid(i, j)}"
-              [(ngModel)]="grid[i][j]"
-              (input)="onInput(i, j)"
+              (input)="onInput(i, j, $event.target.value)"
             />
           </td>
         </tr>
@@ -61,34 +64,62 @@ import { CommonExternalComponent } from '../common-external/common-external.comp
     input.invalid {
       background: #ffd6d6;
     }
+    input[disabled] {
+      background: #e3f0ff !important;
+      color: #1565c0;
+      font-weight: bold;
+      cursor: not-allowed;
+    }
     button {
       padding: 6px 18px;
       font-size: 1rem;
       border: none;
-      background: #007bff;
+      background: #1976d2;
       color: white;
       border-radius: 4px;
       cursor: pointer;
+      transition: background 0.2s;
     }
     button:hover {
-      background: #0056b3;
+      background: #115293;
     }
   `]
 })
 export class SudukuComponent extends CommonExternalComponent {
-  grid: string[][] = Array.from({length: 3}, () => Array(3).fill(''));
+  // Prefill positions: [row, col]: value
+  private readonly prefilled: {[key: string]: string} = {
+    '0,0': '1',
+    '1,1': '2',
+    '2,2': '3'
+  };
 
-  onInput(row: number, col: number): void {
-    const val: string = this.grid[row][col];
+  grid: string[][] = this.getInitialGrid();
+
+  private getInitialGrid(): string[][] {
+    const initial: string[][] = Array.from({length: 3}, () => Array(3).fill(''));
+    for (const key in this.prefilled) {
+      const [row, col]: number[] = key.split(',').map(Number);
+      initial[row][col] = this.prefilled[key];
+    }
+    return initial;
+  }
+
+  isPrefilled(row: number, col: number): boolean {
+    return !!this.prefilled[`${row},${col}`];
+  }
+
+  onInput(row: number, col: number, val: string): void {
+    if (this.isPrefilled(row, col)) return;
     if (!/^[1-3]$/.test(val)) {
       this.grid[row][col] = '';
+    } else {
+      this.grid[row][col] = val;
     }
   }
 
   isInvalid(row: number, col: number): boolean {
     const val: string = this.grid[row][col];
-    if (!val) return false;
-    // Check row & column for duplicates
+    if (!val || this.isPrefilled(row, col)) return false;
     for (let k = 0; k < 3; k++) {
       if (k !== col && this.grid[row][k] === val) return true;
       if (k !== row && this.grid[k][col] === val) return true;
@@ -97,6 +128,6 @@ export class SudukuComponent extends CommonExternalComponent {
   }
 
   resetGrid(): void {
-    this.grid = Array.from({length: 3}, () => Array(3).fill(''));
+    this.grid = this.getInitialGrid();
   }
 }
